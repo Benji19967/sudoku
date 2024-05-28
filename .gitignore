@@ -127,6 +127,8 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+env
+.poetry_venv/
 
 # Spyder project settings
 .spyderproject
