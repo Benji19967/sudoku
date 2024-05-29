@@ -27,7 +27,8 @@ class CellIndex(BaseModel):
     valid_numbers_left: set[int] = set(range(1, 10))
 
     def __lt__(self, other: "CellIndex"):
-        return (self.row, self.col) < (other.row, other.col)
+        # return (self.row, self.col) < (other.row, other.col)
+        return len(self.valid_numbers_left) < len(other.valid_numbers_left)
 
     def __hash__(self):
         return hash((self.row, self.col))
@@ -36,21 +37,21 @@ class CellIndex(BaseModel):
     def is_empty(self) -> bool:
         return self.number == EMPTY_CELL_NUMBER
 
-    @computed_field
-    @property
+    # @computed_field
+    # @property
     def impact_cells(self) -> list["CellIndex"]:
         if not self._impact_cells:
             cells = []
             cells.extend(self._get_cells_same_horizontal())
             cells.extend(self._get_cells_same_vertical())
             cells.extend(self._get_cells_same_bloc())
-            self._impact_cells = sorted(set(cells))
+            self._impact_cells = list(set(cells))
         return self._impact_cells
 
     def display_cell_and_impact_cells(self) -> None:
         board = [[" " for _ in range(NUM_COLS)] for _ in range(NUM_ROWS)]
         board[self.row][self.col] = "x"
-        for cell in self.impact_cells:
+        for cell in self.impact_cells():
             board[cell.row][cell.col] = "o"
         for row in board:
             print(" ".join(str(x) for x in row))
@@ -93,7 +94,7 @@ class Board(BaseModel):
         for row in range(NUM_ROWS)
     ]
     # fewest_valid_numbers: list[tuple[int, CellIndex]] = []
-    fewest_valid_numbers: list[tuple[int, int, int, set[int]]] = []
+    fewest_valid_numbers: list[tuple[CellIndex, int, int, set[int]]] = []
 
     def init_from_2d_array(self, board: list[list[int]]) -> None:
         initial_numbers = []
@@ -116,7 +117,7 @@ class Board(BaseModel):
                     # self.fewest_valid_numbers, (len(cell.valid_numbers_left), cell)
                     self.fewest_valid_numbers,
                     (
-                        len(cell.valid_numbers_left),
+                        cell,
                         cell.row,
                         cell.col,
                         cell.valid_numbers_left,
@@ -149,10 +150,12 @@ class Board(BaseModel):
         Removes the _added_ number from the valid numbers left for each
         impacted cell.
         """
-        for impact_cell in self.board[row][col].impact_cells:
+        # print(f"UPDATE: ROW: {row}, COL: {col}")
+        for impact_cell in self.board[row][col].impact_cells():
             # print(
-            #     f"PRE DISCARD: {self.board[impact_cell.row][impact_cell.col].valid_numbers_left}, DISCARDING: {number}, ROW: {row}, COL: {col}"
+            #     f"PRE DISCARD: {self.board[impact_cell.row][impact_cell.col].valid_numbers_left}, DISCARDING: {number}, ROW: {impact_cell.row}, COL: {impact_cell.col}"
             # )
+            # print(f"HEAP: {self.fewest_valid_numbers}")
             self.board[impact_cell.row][impact_cell.col].valid_numbers_left.discard(
                 number
             )
@@ -184,7 +187,7 @@ def solve():
 
 
 if __name__ == "__main__":
-    board_001 = io.read(filename=Path("inputs/001.csv"))
+    board_001 = io.read(filename=Path("inputs/002_4.csv"))
 
     board = Board()
     board.init_from_2d_array(board=board_001)
@@ -197,7 +200,7 @@ if __name__ == "__main__":
     #     )
     # )
     board.display()
-    for _ in range(44):
+    for _ in range(50):
         row, col, number = board.place_next_number()
         print(row, col, number)
         board.display(last_cell_added=(row, col))
