@@ -7,7 +7,7 @@ authors = [ "Benjamin Labrecque" ]
 [tool.poetry.dependencies]
 python = "^3.8"
 typer = "^0.7.0"
-pydantic = "^1.10.5"
+pydantic = "^2.7.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.1"

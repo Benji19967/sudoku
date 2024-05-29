@@ -1,39 +1,75 @@
-from pydantic import BaseModel
+import heapq
+from itertools import product
+
+from pydantic import BaseModel, computed_field
 
 NUM_ROWS = 9
 NUM_COLS = 9
 
-EMPTY_CELL = -1
+EMPTY_CELL_NUMBER = -1
 EMPTY_CELL_DISPLAY_CHAR = "."
 
+BOARD_ITERATOR = product(range(NUM_ROWS), range(NUM_COLS))
 
-class Cell(BaseModel, frozen=True):
+
+class CellIndex(BaseModel):
+    # Frozen (-ish)
     row: int
     col: int
-    # number: int | None = None
+    _impact_cells: list["CellIndex"] = []
 
-    def __lt__(self, other):
-        return tuple(self.dict().values()) < tuple(other.dict().values())
+    # Mutable
+    number: int = EMPTY_CELL_NUMBER
+    valid_numbers_left: set[int] = set(range(1, 10))
 
-    def get_cells_same_horizontal(self) -> list["Cell"]:
+    def __lt__(self, other: "CellIndex"):
+        return (self.row, self.col) < (other.row, other.col)
+
+    def __hash__(self):
+        return hash((self.row, self.col))
+
+    @property
+    def is_empty(self) -> bool:
+        return self.number == EMPTY_CELL_NUMBER
+
+    @computed_field
+    @property
+    def impact_cells(self) -> list["CellIndex"]:
+        if not self._impact_cells:
+            cells = []
+            cells.extend(self._get_cells_same_horizontal())
+            cells.extend(self._get_cells_same_vertical())
+            cells.extend(self._get_cells_same_bloc())
+            self._impact_cells = sorted(set(cells))
+        return self._impact_cells
+
+    def display_cell_and_impact_cells(self) -> None:
+        board = [[" " for _ in range(NUM_COLS)] for _ in range(NUM_ROWS)]
+        board[self.row][self.col] = "x"
+        for cell in self.impact_cells:
+            board[cell.row][cell.col] = "o"
+        for row in board:
+            print(" ".join(str(x) for x in row))
+
+    def _get_cells_same_horizontal(self) -> list["CellIndex"]:
         cells = []
         for d_col in range(1, 9):
             col = (self.col + d_col) % 9
-            cells.append(Cell(row=self.row, col=col))
+            cells.append(CellIndex(row=self.row, col=col))
         return cells
 
-    def get_cells_same_vertical(self) -> list["Cell"]:
+    def _get_cells_same_vertical(self) -> list["CellIndex"]:
         cells = []
         for d_row in range(1, 9):
             row = (self.row + d_row) % 9
-            cells.append(Cell(row=row, col=self.col))
+            cells.append(CellIndex(row=row, col=self.col))
         return cells
 
-    def get_cells_same_bloc(self) -> list["Cell"]:
-        def get_top_left_cell() -> "Cell":
+    def _get_cells_same_bloc(self) -> list["CellIndex"]:
+        def get_top_left_cell() -> "CellIndex":
             row = 3 * (self.row // 3)
             col = 3 * (self.col // 3)
-            return Cell(row=row, col=col)
+            return CellIndex(row=row, col=col)
 
         top_left_cell = get_top_left_cell()
         cells = []
@@ -41,80 +77,88 @@ class Cell(BaseModel, frozen=True):
             for d_col in range(3):
                 row = top_left_cell.row + d_row
                 col = top_left_cell.col + d_col
-                cell = Cell(row=row, col=col)
+                cell = CellIndex(row=row, col=col)
                 if cell != self:
                     cells.append(cell)
         return cells
 
-    def get_impact_cells(self) -> list["Cell"]:
-        cells = []
-        cells.extend(self.get_cells_same_horizontal())
-        cells.extend(self.get_cells_same_vertical())
-        cells.extend(self.get_cells_same_bloc())
-        return sorted(set(cells))
-
-    def display_cell_and_impact_cells(self) -> None:
-        board = [[" " for _ in range(NUM_COLS)] for _ in range(NUM_ROWS)]
-        board[self.row][self.col] = "x"
-        for cell in self.get_impact_cells():
-            board[cell.row][cell.col] = "o"
-        for row in board:
-            print(" ".join(str(x) for x in row))
-
 
 class Board(BaseModel):
-    board: list[list[int]] = [
-        [EMPTY_CELL for _ in range(NUM_COLS)] for _ in range(NUM_ROWS)
+    board: list[list[CellIndex]] = [
+        [CellIndex(row=row, col=col) for col in range(NUM_COLS)]
+        for row in range(NUM_ROWS)
     ]
+    fewest_valid_numbers: list[tuple[int, CellIndex]] = []
 
     def initialize(self, initial_numbers: tuple[tuple[int, int, int], ...]) -> None:
+        heapq.heapify(self.fewest_valid_numbers)
         for row, col, number in initial_numbers:
-            self.board[row][col] = number
+            self.place_number(row=row, col=col, number=number)
+        for row, col in BOARD_ITERATOR:
+            print(f"ROW: {row}, COL: {col}")
+            cell = self.board[row][col]
+            if cell.is_empty:
+                heapq.heappush(
+                    self.fewest_valid_numbers, (len(cell.valid_numbers_left), cell)
+                )
+        print(f"INIT: {len(self.fewest_valid_numbers)}")
 
-    def compute_valid_numbers_left(self, cell: Cell) -> list[int]:
-        numbers_left = set(range(1, 10))
-        impact_cells = cell.get_impact_cells()
-        for cell in impact_cells:
-            numbers_left.remove(Board.board[cell.row][cell.col])
-        return list(numbers_left)
+    def place_next_number(self) -> tuple[int, int, int]:
+        row, col, number = self._find_next_number_to_place()
+        self.place_number(row=row, col=col, number=number)
+        return row, col, number
+
+    def _find_next_number_to_place(self) -> tuple[int, int, int]:
+        _, cell = heapq.heappop(self.fewest_valid_numbers)
+        return cell.row, cell.col, cell.valid_numbers_left.pop()
+
+    def place_number(self, row: int, col: int, number: int) -> None:
+        self.board[row][col].number = number
+        self.board[row][col].valid_numbers_left = set()
+        self._update_impacted_cells(row=row, col=col, number=number)
+
+    def _update_impacted_cells(self, row: int, col: int, number: int) -> None:
+        """
+        Removes the _added_ number from the valid numbers left for each
+        impacted cell.
+        """
+        for impact_cell in self.board[row][col].impact_cells:
+            self.board[impact_cell.row][impact_cell.col].valid_numbers_left.discard(
+                number
+            )
 
     def display(self) -> None:
         for row_num, row in enumerate(self.board):
             row_characters = []
-            for col_num, number in enumerate(row):
+            for col_num, cell in enumerate(row):
                 if col_num % 3 == 0 and col_num != 0:
                     row_characters.append("|")
                 row_characters.append(
-                    str(number) if number != EMPTY_CELL else EMPTY_CELL_DISPLAY_CHAR
+                    str(cell.number)
+                    if cell.number != EMPTY_CELL_NUMBER
+                    else EMPTY_CELL_DISPLAY_CHAR
                 )
             if row_num % 3 == 0 and row_num != 0:
                 print("-" * (2 * len(row_characters) - 1))
             print(" ".join(row_characters))
 
-            # print(
-            #     " ".join(
-            #         str(number) if number != EMPTY_CELL else EMPTY_CELL_DISPLAY_CHAR
-            #         for number in row
-            #     )
-            # )
 
-
-def update_affecting_cells(cell: int) -> None:
+def solve():
     pass
 
 
-def solve():
-    cells = [list(range(NUM_COLS)) for _ in range(NUM_ROWS)]
-
-    # board.compute_valid_numbers_left()
-
-
 if __name__ == "__main__":
-    # solve()
-    # cell = Cell(row=8, col=8)
-    # cell.display_cell_and_impact_cells()
-    # print(len(cell.get_impact_cells()))
-
     board = Board()
-    board.initialize(((0, 0, 1), (8, 8, 1)))
+    board.initialize(
+        (
+            (0, 0, 1),
+            (6, 6, 2),
+            (7, 4, 3),
+            (8, 8, 4),
+        )
+    )
     board.display()
+    for _ in range(30):
+        print(board.place_next_number())
+        board.display()
+        print(len(board.fewest_valid_numbers))
