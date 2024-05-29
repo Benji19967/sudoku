@@ -1,7 +1,11 @@
 import heapq
 from itertools import product
+from pathlib import Path
+from typing import Iterable
 
 from pydantic import BaseModel, computed_field
+
+from sudoku import io
 
 NUM_ROWS = 9
 NUM_COLS = 9
@@ -9,7 +13,7 @@ NUM_COLS = 9
 EMPTY_CELL_NUMBER = -1
 EMPTY_CELL_DISPLAY_CHAR = "."
 
-BOARD_ITERATOR = product(range(NUM_ROWS), range(NUM_COLS))
+BOARD_ITERATOR = list(product(range(NUM_ROWS), range(NUM_COLS)))
 
 
 class CellIndex(BaseModel):
@@ -88,19 +92,37 @@ class Board(BaseModel):
         [CellIndex(row=row, col=col) for col in range(NUM_COLS)]
         for row in range(NUM_ROWS)
     ]
-    fewest_valid_numbers: list[tuple[int, CellIndex]] = []
+    # fewest_valid_numbers: list[tuple[int, CellIndex]] = []
+    fewest_valid_numbers: list[tuple[int, int, int, set[int]]] = []
 
-    def initialize(self, initial_numbers: tuple[tuple[int, int, int], ...]) -> None:
+    def init_from_2d_array(self, board: list[list[int]]) -> None:
+        initial_numbers = []
+        for row, col in BOARD_ITERATOR:
+            number = board[row][col]
+            if number != EMPTY_CELL_NUMBER:
+                initial_numbers.append((row, col, board[row][col]))
+        self.initialize(initial_numbers=initial_numbers)
+
+    def initialize(self, initial_numbers: Iterable[tuple[int, int, int]]) -> None:
         heapq.heapify(self.fewest_valid_numbers)
         for row, col, number in initial_numbers:
             self.place_number(row=row, col=col, number=number)
         for row, col in BOARD_ITERATOR:
-            print(f"ROW: {row}, COL: {col}")
             cell = self.board[row][col]
             if cell.is_empty:
+                print(f"ROW: {row}, COL: {col}")
+                print(f"VALID_NUMBERS_LEFT: {cell.valid_numbers_left}")
                 heapq.heappush(
-                    self.fewest_valid_numbers, (len(cell.valid_numbers_left), cell)
+                    # self.fewest_valid_numbers, (len(cell.valid_numbers_left), cell)
+                    self.fewest_valid_numbers,
+                    (
+                        len(cell.valid_numbers_left),
+                        cell.row,
+                        cell.col,
+                        cell.valid_numbers_left,
+                    ),
                 )
+                print(f"HEAP: {self.fewest_valid_numbers}")
         print(f"INIT: {len(self.fewest_valid_numbers)}")
 
     def place_next_number(self) -> tuple[int, int, int]:
@@ -109,8 +131,13 @@ class Board(BaseModel):
         return row, col, number
 
     def _find_next_number_to_place(self) -> tuple[int, int, int]:
-        _, cell = heapq.heappop(self.fewest_valid_numbers)
-        return cell.row, cell.col, cell.valid_numbers_left.pop()
+        # _, cell = heapq.heappop(self.fewest_valid_numbers)
+        _, row, col, valid_numbers_left = heapq.heappop(self.fewest_valid_numbers)
+        while not valid_numbers_left:
+            print(f"CELL: {row}, {col}, {valid_numbers_left}")
+            # _, cell = heapq.heappop(self.fewest_valid_numbers)
+            _, row, col, valid_numbers_left = heapq.heappop(self.fewest_valid_numbers)
+        return row, col, valid_numbers_left.pop()
 
     def place_number(self, row: int, col: int, number: int) -> None:
         self.board[row][col].number = number
@@ -123,18 +150,27 @@ class Board(BaseModel):
         impacted cell.
         """
         for impact_cell in self.board[row][col].impact_cells:
+            # print(
+            #     f"PRE DISCARD: {self.board[impact_cell.row][impact_cell.col].valid_numbers_left}, DISCARDING: {number}, ROW: {row}, COL: {col}"
+            # )
             self.board[impact_cell.row][impact_cell.col].valid_numbers_left.discard(
                 number
             )
 
-    def display(self) -> None:
+    def display(self, last_cell_added: tuple[int, int] | None = None) -> None:
         for row_num, row in enumerate(self.board):
             row_characters = []
             for col_num, cell in enumerate(row):
                 if col_num % 3 == 0 and col_num != 0:
                     row_characters.append("|")
+
+                if last_cell_added and last_cell_added == (row_num, col_num):
+                    number = f"\033[91m{cell.number}\033[0m"
+                else:
+                    number = str(cell.number)
+
                 row_characters.append(
-                    str(cell.number)
+                    number
                     if cell.number != EMPTY_CELL_NUMBER
                     else EMPTY_CELL_DISPLAY_CHAR
                 )
@@ -148,17 +184,21 @@ def solve():
 
 
 if __name__ == "__main__":
+    board_001 = io.read(filename=Path("inputs/001.csv"))
+
     board = Board()
-    board.initialize(
-        (
-            (0, 0, 1),
-            (6, 6, 2),
-            (7, 4, 3),
-            (8, 8, 4),
-        )
-    )
+    board.init_from_2d_array(board=board_001)
+    # board.initialize(
+    #     (
+    #         (0, 0, 1),
+    #         (6, 6, 2),
+    #         (7, 4, 3),
+    #         (8, 8, 4),
+    #     )
+    # )
     board.display()
-    for _ in range(30):
-        print(board.place_next_number())
-        board.display()
+    for _ in range(44):
+        row, col, number = board.place_next_number()
+        print(row, col, number)
+        board.display(last_cell_added=(row, col))
         print(len(board.fewest_valid_numbers))
