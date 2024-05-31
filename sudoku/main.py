@@ -1,3 +1,11 @@
+#
+# This was an initial attempt -- the idea was to use more complex
+# logic than just bruteforce backtracking. For a 9x9 grid,
+# bruteforce backtracking is good enough though (takes ~0.15s
+# to solve a puzzle on a MacBook Pro M1)
+#
+
+
 import heapq
 from itertools import product
 from pathlib import Path
