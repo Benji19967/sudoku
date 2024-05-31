@@ -127,11 +127,11 @@ class Board(BaseModel):
         print(f"INIT: {len(self.fewest_valid_numbers)}")
 
     def place_next_number(self) -> tuple[int, int, int]:
-        row, col, number = self._find_next_number_to_place()
+        row, col, number = self._find_next_number_to_place_v1()
         self.place_number(row=row, col=col, number=number)
         return row, col, number
 
-    def _find_next_number_to_place(self) -> tuple[int, int, int]:
+    def _find_next_number_to_place_v1(self) -> tuple[int, int, int]:
         # _, cell = heapq.heappop(self.fewest_valid_numbers)
         _, row, col, valid_numbers_left = heapq.heappop(self.fewest_valid_numbers)
         while not valid_numbers_left:
@@ -139,6 +139,9 @@ class Board(BaseModel):
             # _, cell = heapq.heappop(self.fewest_valid_numbers)
             _, row, col, valid_numbers_left = heapq.heappop(self.fewest_valid_numbers)
         return row, col, valid_numbers_left.pop()
+
+    def _find_next_number_to_place_v2(self) -> tuple[int, int, int]:
+        pass
 
     def place_number(self, row: int, col: int, number: int) -> None:
         self.board[row][col].number = number
@@ -152,13 +155,14 @@ class Board(BaseModel):
         """
         # print(f"UPDATE: ROW: {row}, COL: {col}")
         for impact_cell in self.board[row][col].impact_cells():
-            # print(
-            #     f"PRE DISCARD: {self.board[impact_cell.row][impact_cell.col].valid_numbers_left}, DISCARDING: {number}, ROW: {impact_cell.row}, COL: {impact_cell.col}"
-            # )
-            # print(f"HEAP: {self.fewest_valid_numbers}")
             self.board[impact_cell.row][impact_cell.col].valid_numbers_left.discard(
                 number
             )
+            heapq.heapify(self.fewest_valid_numbers)
+            print(
+                f"PRE DISCARD: {self.board[impact_cell.row][impact_cell.col].valid_numbers_left}, DISCARDING: {number}, ROW: {impact_cell.row}, COL: {impact_cell.col}"
+            )
+            print(f"HEAP: {self.fewest_valid_numbers}")
 
     def display(self, last_cell_added: tuple[int, int] | None = None) -> None:
         for row_num, row in enumerate(self.board):
