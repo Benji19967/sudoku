@@ -1,7 +1,16 @@
 # Sudoku solver
 
-## First Algorithm
+## Backtracking
 
+This is the simplest working solution--backtracking without any
+optimizations. The cleanest way to implement this is to use recursion.
+
+- For each empty cell, place the lowest number that is not restricted
+vertically, horizontally or by the bloc. 
+- If at a cell no number can be placed, backtrack to the previous
+cell and repeat.
+
+## First Algorithm
 
 Pre-computation
 - For each cell, compute the number of valid numbers left
