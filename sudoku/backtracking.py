@@ -102,6 +102,6 @@ def solve(board) -> None:
 
 if __name__ == "__main__":
     board = [[EMPTY] * N for _ in range(N)]
-    board_001 = io.read(filename=Path("inputs/003_5.csv"), empty_number=EMPTY)
+    board_001 = io.read(filename=Path("inputs/004_5.csv"), empty_number=EMPTY)
     display_board(board_001)
     solve(board_001)
