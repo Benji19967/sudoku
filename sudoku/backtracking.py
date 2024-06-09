@@ -43,16 +43,15 @@ def ok_to_place(board, i, j, number) -> bool:
             return False
 
     # bloc
-    # TODO: replace '3' with 'sqrt(N)' constant
     def get_top_left_cell() -> tuple[int, int]:
-        row = 3 * (i // 3)
-        col = 3 * (j // 3)
+        row = N_SQRT * (i // N_SQRT)
+        col = N_SQRT * (j // N_SQRT)
         return row, col
 
     top_left_row, top_left_col = get_top_left_cell()
-    for d_row in range(3):
+    for d_row in range(N_SQRT):
         row = top_left_row + d_row
-        for d_col in range(3):
+        for d_col in range(N_SQRT):
             col = top_left_col + d_col
             # print(i, j, top_left_row, top_left_col, d_row, d_col)
             if board[row][col] == number and row != i and col != j:
@@ -68,27 +67,18 @@ def next_cell(i, j) -> tuple[int, int]:
 
 
 def display_board(board) -> None:
-    # for row in board:
-    #     print(" ".join(str(x) for x in row))
-    # print("-" * (2 * N - 1))
     len_row_characters = 0
 
     for row_num, row in enumerate(board):
         row_characters = []
         for col_num, number in enumerate(row):
-            if col_num % 3 == 0 and col_num != 0:
+            if col_num % N_SQRT == 0 and col_num != 0:
                 row_characters.append("|")
-
-            # if last_cell_added and last_cell_added == (row_num, col_num):
-            #     number = f"\033[91m{cell.number}\033[0m"
-            # else:
-            #     number = str(cell.number)
-
             row_characters.append(
                 str(number) if number != EMPTY else EMPTY_CELL_DISPLAY_CHAR
             )
             len_row_characters = len(row_characters)
-        if row_num % 3 == 0 and row_num != 0:
+        if row_num % N_SQRT == 0 and row_num != 0:
             print("-" * (2 * len_row_characters - 1))
         print(" ".join(row_characters))
     print()
@@ -96,12 +86,25 @@ def display_board(board) -> None:
     print()
 
 
+def read_board_from_file(filename: str) -> list[list[int]]:
+    return io.read(filename=Path(filename), empty_number=EMPTY)
+
+
+def generate_empty_board() -> list[list[int]]:
+    return [[EMPTY] * N for _ in range(N)]
+
+
+def get_board(filename: str | None) -> list[list[int]]:
+    if filename:
+        return read_board_from_file(filename=filename)
+    return generate_empty_board()
+
+
 def solve(board) -> None:
     try_to_place(board, 0, 0)
 
 
 if __name__ == "__main__":
-    board = [[EMPTY] * N for _ in range(N)]
-    board_001 = io.read(filename=Path("inputs/004_5.csv"), empty_number=EMPTY)
-    display_board(board_001)
-    solve(board_001)
+    board = get_board(filename="inputs/004_5.csv")
+    display_board(board=board)
+    solve(board)
