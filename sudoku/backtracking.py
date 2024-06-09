@@ -4,7 +4,7 @@ from pathlib import Path
 from sudoku import io
 
 N = 9
-N_SQRT = math.sqrt(N)
+N_SQRT = int(math.sqrt(N))
 EMPTY = -1
 EMPTY_CELL_DISPLAY_CHAR = "."
 
@@ -53,7 +53,6 @@ def ok_to_place(board, i, j, number) -> bool:
         row = top_left_row + d_row
         for d_col in range(N_SQRT):
             col = top_left_col + d_col
-            # print(i, j, top_left_row, top_left_col, d_row, d_col)
             if board[row][col] == number and row != i and col != j:
                 return False
 
