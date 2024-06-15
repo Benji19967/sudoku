@@ -34,11 +34,11 @@ class CellIndex(BaseModel):
     number: int = EMPTY_CELL_NUMBER
     valid_numbers_left: set[int] = set(range(1, 10))
 
-    def __lt__(self, other: "CellIndex"):
+    def __lt__(self, other: "CellIndex") -> bool:
         # return (self.row, self.col) < (other.row, other.col)
         return len(self.valid_numbers_left) < len(other.valid_numbers_left)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.row, self.col))
 
     @property
@@ -148,9 +148,6 @@ class Board(BaseModel):
             _, row, col, valid_numbers_left = heapq.heappop(self.fewest_valid_numbers)
         return row, col, valid_numbers_left.pop()
 
-    def _find_next_number_to_place_v2(self) -> tuple[int, int, int]:
-        pass
-
     def place_number(self, row: int, col: int, number: int) -> None:
         self.board[row][col].number = number
         self.board[row][col].valid_numbers_left = set()
@@ -192,10 +189,6 @@ class Board(BaseModel):
             if row_num % 3 == 0 and row_num != 0:
                 print("-" * (2 * len(row_characters) - 1))
             print(" ".join(row_characters))
-
-
-def solve():
-    pass
 
 
 if __name__ == "__main__":

@@ -8,8 +8,10 @@ N_SQRT = int(math.sqrt(N))
 EMPTY = -1
 EMPTY_CELL_DISPLAY_CHAR = "."
 
+Board = list[list[int]]
 
-def try_to_place(board, i, j):
+
+def try_to_place(board: Board, i: int, j: int) -> None:
     if board[i][j] != EMPTY:
         if i == N - 1 and j == N - 1:
             display_board(board)
@@ -29,7 +31,7 @@ def try_to_place(board, i, j):
             board[i][j] = EMPTY
 
 
-def ok_to_place(board, i, j, number) -> bool:
+def ok_to_place(board: Board, i: int, j: int, number: int) -> bool:
     # horizontal
     row = i
     for col in range(N):
@@ -59,13 +61,13 @@ def ok_to_place(board, i, j, number) -> bool:
     return True
 
 
-def next_cell(i, j) -> tuple[int, int]:
+def next_cell(i: int, j: int) -> tuple[int, int]:
     if j == N - 1:
         return (i + 1, 0)
     return (i, j + 1)
 
 
-def display_board(board) -> None:
+def display_board(board: Board) -> None:
     len_row_characters = 0
 
     for row_num, row in enumerate(board):
@@ -85,21 +87,21 @@ def display_board(board) -> None:
     print()
 
 
-def read_board_from_file(filename: str) -> list[list[int]]:
+def read_board_from_file(filename: str) -> Board:
     return io.read(filename=Path(filename), empty_number=EMPTY)
 
 
-def generate_empty_board() -> list[list[int]]:
+def generate_empty_board() -> Board:
     return [[EMPTY] * N for _ in range(N)]
 
 
-def get_board(filename: str | None) -> list[list[int]]:
+def get_board(filename: str | None) -> Board:
     if filename:
         return read_board_from_file(filename=filename)
     return generate_empty_board()
 
 
-def solve(board) -> None:
+def solve(board: Board) -> None:
     try_to_place(board, 0, 0)
 
 
