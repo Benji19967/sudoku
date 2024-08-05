@@ -10,6 +10,10 @@ vertically, horizontally or by the bloc.
 - If at a cell no number can be placed, backtrack to the previous
 cell and repeat.
 
+```
+python sudoku/backtracking.py
+```
+
 ## First Algorithm
 
 Pre-computation
