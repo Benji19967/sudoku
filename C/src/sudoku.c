@@ -2,34 +2,44 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../data_structures/ds_c/src/array.h"
+
 #define STRING_BUFFER_SIZE 200
 
-const int n = 9;
+const int N = 9;
 
-int* sudoku_read_board(char* filepath) {
+int** sudoku_read_board(char* filepath) {
+  // TODO: Would it be a better design decision to ask users to pass in an array
+  // for board?
+  // That way they know they have to take care of allocating/deallocating
+  // memory.
+
   FILE* fptr = NULL;
+  // filepath is relative to cwd (i.e. dir where program was launched)
   fptr = fopen(filepath, "r");
   char string_buffer[STRING_BUFFER_SIZE];
-  int lines[n][n];
+  int** board = array_create_2d(N, N);
+  char* token;
 
-  // one call to fscanf reads one line
   if (fptr != NULL) {
-    // TODO: parse line correctly
     int i = 0;
+    // one call to fscanf reads one line
     while (fscanf(fptr, "%s", string_buffer) != EOF) {
-      char* token = strtok(string_buffer, ",");
+      token = strtok(string_buffer, ",");
       int j = 0;
       while (token) {
-        lines[i][j] = atoi(token);
+        board[i][j] = atoi(token);
         token = strtok(NULL, ",");
         j++;
       }
       i++;
     }
   }
-
   fclose(fptr);
 
-  void sudoku(int board[][n]) {
-    // TODO
-  }
+  return board;
+}
+
+// void sudoku(int board[][n]) {
+//   // TODO
+// }

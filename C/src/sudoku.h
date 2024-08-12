@@ -1,3 +1,3 @@
 // TODO
 
-int* sudoku_read_board(char* filepath);
+int** sudoku_read_board(char* filepath);
