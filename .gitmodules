@@ -1,5 +1,5 @@
-[submodule "C/unity"]
-	path = C/unity
+[submodule "c/unity"]
+	path = c/unity
 	url = git@github.com:ThrowTheSwitch/Unity.git
 [submodule "c/data_structures"]
 	path = c/data_structures
