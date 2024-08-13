@@ -192,7 +192,7 @@ class Board(BaseModel):
 
 
 if __name__ == "__main__":
-    board_001 = io.read(filename=Path("../input_boards/002_4.csv"))
+    board_001 = io.read(filename=Path("../boards/input/002_4.csv"))
 
     board = Board()
     board.init_from_2d_array(board=board_001)
