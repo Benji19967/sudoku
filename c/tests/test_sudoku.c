@@ -15,13 +15,12 @@ void test_read_board() {
       {1, 2, 3, 4, 5, 6, 7, 8, 9}, {1, 2, 3, 4, 5, 6, 7, 8, 9},
       {1, 2, 3, 4, 5, 6, 7, 8, 9}, {1, 2, 3, 4, 5, 6, 7, 8, 9},
       {1, 2, 3, 4, 5, 6, 7, 8, 9}, {1, 2, 3, 4, 5, 6, 7, 8, 9},
-      {1, 2, 3, 4, 5, 6, 7, 8, 9}, {1, 2, 3, 4, 5, 6, 7, 8, 9},
+      {1, 2, 3, 4, 5, 6, 7, 8, 9}, {-1, 2, 3, 4, 5, 6, 7, 8, 9},
       {9, 8, 7, 6, 5, 4, 3, 2, 1},
   };
 
   int n = 9;
-  int **board = sudoku_read_board("tests/mock_board.csv");
-  array_print_2d(board, n, n);
+  int **board = sudoku_read_board("tests/fixtures/mock_board.csv");
 
   for (int i = 0; i < n; i++) {
     TEST_ASSERT_EQUAL_INT_ARRAY(test_board[i], board[i], n);

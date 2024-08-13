@@ -106,6 +106,6 @@ def solve(board: Board) -> None:
 
 
 if __name__ == "__main__":
-    board = get_board(filename="inputs/004_5.csv")
+    board = get_board(filename="../input_boards/004_5.csv")
     display_board(board=board)
     solve(board)
