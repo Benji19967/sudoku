@@ -8,7 +8,7 @@
 
 const int N = 9;
 const int N_SQRT = 3;
-const int EMPTY = -1;
+const int EMPTY = 0;
 
 typedef struct Pair {
   int i;
@@ -36,7 +36,7 @@ int** sudoku_read_board(char* filepath) {
       int j = 0;
       while (token) {
         if (*token == 'x') {
-          board[i][j] = -1;
+          board[i][j] = EMPTY;
         } else {
           board[i][j] = atoi(token);
         }
@@ -96,32 +96,37 @@ Pair next_cell(int i, int j) {
   return p;
 }
 
-void try_to_place(int** board, int i, int j) {
+int try_to_place(int** board, int i, int j) {
   if (board[i][j] != EMPTY) {
     if (i == N - 1 && j == N - 1) {
-      array_print_2d(board, N, N);
-      return;
+      return 1;
     }
     Pair new_cell = next_cell(i, j);
-    try_to_place(board, new_cell.i, new_cell.j);
-    return;
+    return try_to_place(board, new_cell.i, new_cell.j);
   }
 
   for (int number = 1; number < N + 1; number++) {
     if (ok_to_place(board, i, j, number)) {
       board[i][j] = number;
       if (i == N - 1 && j == N - 1) {
-        array_print_2d(board, N, N);
-        return;
+        return 1;
       }
       Pair new_cell = next_cell(i, j);
-      try_to_place(board, new_cell.i, new_cell.j);
+      int found_solution = try_to_place(board, new_cell.i, new_cell.j);
+      if (found_solution) {
+        return 1;
+      }
       board[i][j] = EMPTY;
     }
   }
+  return 0;
 }
 
-void sudoku_solve(int** input_board) {
-  int** solved_board = array_copy_2d(input_board, 9, 9);
-  try_to_place(solved_board, 0, 0);
+int** sudoku_solve(int** input_board) {
+  int** board = array_copy_2d(input_board, 9, 9);
+  int found_solution = try_to_place(board, 0, 0);
+  if (found_solution) {
+    return board;
+  }
+  return NULL;
 }
