@@ -123,6 +123,9 @@ int try_to_place(int** board, int i, int j) {
 }
 
 int** sudoku_solve(int** input_board) {
+  // TODO: Same as above: should probably ask user to pass an empty board so
+  // they know to deallocate?
+
   int** board = array_copy_2d(input_board, 9, 9);
   int found_solution = try_to_place(board, 0, 0);
   if (found_solution) {
