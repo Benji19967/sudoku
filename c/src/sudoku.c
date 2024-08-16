@@ -1,3 +1,5 @@
+#include <math.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -82,6 +84,54 @@ int ok_to_place(int** board, int i, int j, int number) {
   }
 
   return 1;
+}
+
+/*
+ * Get bloc number of a cell.
+ *
+ * Example indexing for a 9x9 board:
+ *
+ * 0 1 2
+ * 3 4 5
+ * 6 7 8
+ */
+int sudoku_get_bloc_index(int i, int j, int n) {
+  int sqrt_n = sqrt(n);
+  int bloc_idx_vertical = i / sqrt_n;
+  int bloc_idx_horizontal = j / sqrt_n;
+
+  return bloc_idx_vertical * sqrt_n + bloc_idx_horizontal;
+}
+
+/*
+ * Check that each row, col, and bloc contains the numbers 1 through n exactly
+ * once.
+ */
+bool sudoku_is_board_valid(int** board, int n) {
+  int rows[n][n + 1];
+  int cols[n][n + 1];
+  int blocs[n][n + 1];
+
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < n; j++) {
+      int num = board[i][j];
+      int bloc_idx = sudoku_get_bloc_index(i, j, n);
+
+      rows[i][num] = 1;
+      cols[j][num] = 1;
+      blocs[bloc_idx][num] = 1;
+    }
+  }
+
+  for (int i = 0; i < n; i++) {
+    for (int num = 1; num < n + 1; num++) {
+      if (rows[i][num] != 1 || cols[i][num] != 1 || blocs[i][num] != 1) {
+        return false;
+      }
+    }
+  }
+
+  return true;
 }
 
 Pair next_cell(int i, int j) {

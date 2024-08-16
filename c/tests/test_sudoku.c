@@ -1,3 +1,5 @@
+#include <stdbool.h>
+
 #include "../data_structures/ds_c/src/array.h"
 #include "../src/sudoku.h"
 #include "../unity/src/unity.h"
@@ -48,11 +50,20 @@ void test_sudoku() {
   }
 }
 
+void test_sudoku_is_board_valid() {
+  char* board_filepath = "tests/fixtures/mock_board_is_valid_0.csv";
+  int** board = sudoku_read_board(board_filepath);
+  bool is_board_valid = sudoku_is_board_valid(board, 9);
+
+  TEST_ASSERT_EQUAL(true, is_board_valid);
+}
+
 int main(void) {
   UNITY_BEGIN();
 
   RUN_TEST(test_sudoku_read_board);
   RUN_TEST(test_sudoku);
+  RUN_TEST(test_sudoku_is_board_valid);
 
   UNITY_END();
 
