@@ -51,11 +51,17 @@ void test_sudoku() {
 }
 
 void test_sudoku_is_board_valid() {
+  // TODO: clean this test up. Can you add parametrized tests?
   char* board_filepath = "tests/fixtures/mock_board_is_valid_0.csv";
   int** board = sudoku_read_board(board_filepath);
   bool is_board_valid = sudoku_is_board_valid(board, 9);
 
+  char* board_filepath1 = "tests/fixtures/mock_board_is_valid_1.csv";
+  int** board1 = sudoku_read_board(board_filepath1);
+  bool is_board_valid1 = sudoku_is_board_valid(board1, 9);
+
   TEST_ASSERT_EQUAL(true, is_board_valid);
+  TEST_ASSERT_EQUAL(false, is_board_valid1);
 }
 
 int main(void) {
