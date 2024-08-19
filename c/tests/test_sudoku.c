@@ -64,12 +64,21 @@ void test_sudoku_is_board_valid() {
   TEST_ASSERT_EQUAL(false, is_board_valid1);
 }
 
+void test_sudoku_generate_solved_board() {
+  int n = 9;
+  int** board = sudoku_generate_solved_board(n);
+  array_print_2d(board, n, n);
+
+  TEST_ASSERT_EQUAL(true, sudoku_is_board_valid(board, n));
+}
+
 int main(void) {
   UNITY_BEGIN();
 
   RUN_TEST(test_sudoku_read_board);
   RUN_TEST(test_sudoku);
   RUN_TEST(test_sudoku_is_board_valid);
+  RUN_TEST(test_sudoku_generate_solved_board);
 
   UNITY_END();
 

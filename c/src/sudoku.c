@@ -183,3 +183,9 @@ int** sudoku_solve(int** input_board) {
   }
   return NULL;
 }
+
+int** sudoku_generate_solved_board(int n) {
+  int** board = array_create_2d(9, 9);
+
+  return sudoku_solve(board);
+}
