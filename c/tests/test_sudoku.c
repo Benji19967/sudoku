@@ -70,9 +70,9 @@ void test_sudoku_is_board_valid() {
 }
 
 void test_sudoku_solve() {
-  // char* input_board_filepath = "tests/fixtures/mock_board_input.csv";
-  // int** input_board = sudoku_read_board(input_board_filepath, 9);
-  // int** solved_board = sudoku_solve(input_board, 9);
+  char* input_board_filepath = "tests/fixtures/mock_board_input.csv";
+  int** input_board = sudoku_read_board(input_board_filepath, 9);
+  int** solved_board = sudoku_solve(input_board, 9);
 
   char* input_board_filepath_2x2 = "tests/fixtures/mock_board_input_2x2.csv";
   int** input_board_2x2 = sudoku_read_board(input_board_filepath_2x2, 4);
