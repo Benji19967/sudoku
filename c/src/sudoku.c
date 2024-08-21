@@ -196,7 +196,7 @@ int try_to_place(int** board, const int n, int** solutions[], int solution_idx,
   }
 
   for (int number = 1; number < n + 1; number++) {
-    printf("Number: %d\n", number);
+    // printf("Number: %d\n", number);
     if (ok_to_place(board, n, i, j, number)) {
       printf("Is ok to place: i: %d, j: %d, number: %d\n", i, j, number);
       board[i][j] = number;
@@ -246,14 +246,14 @@ int** sudoku_solve(int** input_board, const int n) {
   return solution;
 }
 
-void sudoku_solve_all(int** input_board, const int n, int** solutions[]) {
+int sudoku_solve_all(int** input_board, const int n, int** solutions[]) {
   // TODO: Same as above: should probably ask user to pass an empty board so
   // they know to deallocate?
 
   int** board = array_copy_2d(input_board, n, n);
   printf("Start try_to_place solve_all\n");
-  try_to_place(board, n, solutions, 0, 20, 0, 0);
-  // return solutions;
+  int num_solutions = try_to_place(board, n, solutions, 0, 300, 0, 0);
+  return num_solutions;
 }
 
 int** sudoku_generate_solved_board(const int n) {
