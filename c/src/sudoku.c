@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "../data_structures/ds_c/src/array.h"
 
@@ -24,6 +25,10 @@ int** sudoku_read_board(char* filepath, const int n) {
   FILE* fptr = NULL;
   // filepath is relative to cwd (i.e. dir where program was launched)
   fptr = fopen(filepath, "r");
+  if (fptr == NULL) {
+    fclose(fptr);
+    return NULL;
+  }
   char string_buffer[STRING_BUFFER_SIZE];
   int** board = array_create_2d(n, n);
   char* token;
@@ -104,34 +109,55 @@ int sudoku_get_bloc_index(const int n, int i, int j) {
 }
 
 /*
- * Check that each row, col, and bloc contains the numbers 1 through n exactly
- * once.
+ * If a number appears more than once in a row, col, or bloc, then the board is
+ * invalid.
  */
-bool sudoku_is_board_valid(int** board, const int n) {
+bool sudoku_is_board_invalid(int** board, const int n) {
   int rows[n][n + 1];
   int cols[n][n + 1];
   int blocs[n][n + 1];
+  array_init_2d((int*)rows, n, n + 1, 0);
+  array_init_2d((int*)cols, n, n + 1, 0);
+  array_init_2d((int*)blocs, n, n + 1, 0);
 
   for (int i = 0; i < n; i++) {
     for (int j = 0; j < n; j++) {
       int num = board[i][j];
       int bloc_idx = sudoku_get_bloc_index(n, i, j);
 
-      rows[i][num] = 1;
-      cols[j][num] = 1;
-      blocs[bloc_idx][num] = 1;
+      rows[i][num]++;
+      cols[j][num]++;
+      blocs[bloc_idx][num]++;
     }
   }
 
   for (int i = 0; i < n; i++) {
     for (int num = 1; num < n + 1; num++) {
-      if (rows[i][num] != 1 || cols[i][num] != 1 || blocs[i][num] != 1) {
-        return false;
+      if (rows[i][num] > 1 || cols[i][num] > 1 || blocs[i][num] > 1) {
+        return true;
       }
     }
   }
 
+  return false;
+}
+
+bool sudoku_is_board_full(int** board, const int n) {
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < n; j++) {
+      if (board[i][j] == EMPTY) {
+        return false;
+      }
+    }
+  }
   return true;
+}
+
+bool sudoku_is_board_valid(int** board, const int n) {
+  if (sudoku_is_board_full(board, n) && !sudoku_is_board_invalid(board, n)) {
+    return true;
+  }
+  return false;
 }
 
 Pair next_cell(const int n, int i, int j) {

@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <stdio.h>
+#include <time.h>
 
 #include "../data_structures/ds_c/src/array.h"
 #include "../src/sudoku.h"
@@ -11,6 +12,18 @@ void setUp(void) {
 
 void tearDown(void) {
   // clean stuff up here
+}
+
+void test_sudoku_read_board_invalid_filepath() {
+  int** board = sudoku_read_board("does/not/exist", 9);
+  TEST_ASSERT_EQUAL_PTR(NULL, board);
+}
+
+int** read_board_or_fail(char* filepath, const int n) {
+  int** board = sudoku_read_board(filepath, n);
+  TEST_ASSERT_NOT_NULL(board);
+
+  return board;
 }
 
 void test_sudoku_read_board() {
@@ -29,13 +42,13 @@ void test_sudoku_read_board() {
   };
 
   int** board =
-      sudoku_read_board("tests/fixtures/mock_board_read_input.csv", 9);
+      read_board_or_fail("tests/fixtures/mock_board_read_input.csv", 9);
 
   for (int i = 0; i < 9; i++) {
     TEST_ASSERT_EQUAL_INT_ARRAY(expected_board[i], board[i], 9);
   }
   int** board_2x2 =
-      sudoku_read_board("tests/fixtures/mock_board_read_input_2x2.csv", 4);
+      read_board_or_fail("tests/fixtures/mock_board_read_input_2x2.csv", 4);
 
   for (int i = 0; i < 4; i++) {
     TEST_ASSERT_EQUAL_INT_ARRAY(expected_board_2x2[i], board_2x2[i], 4);
@@ -47,20 +60,20 @@ void test_sudoku_read_board() {
 
 void test_sudoku_is_board_valid() {
   // TODO: clean this test up. Can you add parametrized tests?
-  char* board_filepath = "tests/fixtures/mock_board_is_valid_0.csv";
-  int** board = sudoku_read_board(board_filepath, 9);
+  char* board_filepath = "tests/fixtures/mock_board_is_valid.csv";
+  int** board = read_board_or_fail(board_filepath, 9);
   bool is_board_valid = sudoku_is_board_valid(board, 9);
 
-  char* board_filepath1 = "tests/fixtures/mock_board_is_valid_1.csv";
-  int** board1 = sudoku_read_board(board_filepath1, 9);
+  char* board_filepath1 = "tests/fixtures/mock_board_is_invalid.csv";
+  int** board1 = read_board_or_fail(board_filepath1, 9);
   bool is_board_valid1 = sudoku_is_board_valid(board1, 9);
 
-  char* board_filepath_2x2_0 = "tests/fixtures/mock_board_is_valid_2x2_0.csv";
-  int** board_2x2_0 = sudoku_read_board(board_filepath_2x2_0, 4);
+  char* board_filepath_2x2_0 = "tests/fixtures/mock_board_is_valid_2x2.csv";
+  int** board_2x2_0 = read_board_or_fail(board_filepath_2x2_0, 4);
   bool is_board_valid_2x2_0 = sudoku_is_board_valid(board_2x2_0, 4);
 
-  char* board_filepath_2x2_1 = "tests/fixtures/mock_board_is_valid_2x2_1.csv";
-  int** board_2x2_1 = sudoku_read_board(board_filepath_2x2_1, 4);
+  char* board_filepath_2x2_1 = "tests/fixtures/mock_board_is_invalid_2x2.csv";
+  int** board_2x2_1 = read_board_or_fail(board_filepath_2x2_1, 4);
   bool is_board_valid_2x2_1 = sudoku_is_board_valid(board_2x2_1, 4);
 
   TEST_ASSERT_EQUAL(true, is_board_valid);
@@ -71,11 +84,11 @@ void test_sudoku_is_board_valid() {
 
 void test_sudoku_solve() {
   char* input_board_filepath = "tests/fixtures/mock_board_input.csv";
-  int** input_board = sudoku_read_board(input_board_filepath, 9);
+  int** input_board = read_board_or_fail(input_board_filepath, 9);
   int** solved_board = sudoku_solve(input_board, 9);
 
   char* input_board_filepath_2x2 = "tests/fixtures/mock_board_input_2x2.csv";
-  int** input_board_2x2 = sudoku_read_board(input_board_filepath_2x2, 4);
+  int** input_board_2x2 = read_board_or_fail(input_board_filepath_2x2, 4);
   int** solved_board_2x2 = sudoku_solve(input_board_2x2, 4);
 
   TEST_ASSERT_EQUAL(true, sudoku_is_board_valid(solved_board, 9));
@@ -83,15 +96,22 @@ void test_sudoku_solve() {
 }
 
 void test_sudoku_solve_all() {
-  char* input_board_filepath =
-      "tests/fixtures/mock_board_non_unique_solution.csv";
-  int** input_board = sudoku_read_board(input_board_filepath, 9);
-  int** solutions[100];  // TODO: parametrize
-  sudoku_solve_all(input_board, 9, solutions);
+  // char* input_board_filepath =
+  //     "tests/fixtures/mock_board_non_unique_solution.csv";
+  // int** input_board = read_board_or_fail(input_board_filepath, 9);
+  // int** solutions[100];  // TODO: parametrize
+  // sudoku_solve_all(input_board, 9, solutions);
 
-  int n = 9;
+  char* input_board_filepath_2x2 =
+      "tests/fixtures/mock_board_non_unique_solution_2x2.csv";
+  int** input_board_2x2 = read_board_or_fail(input_board_filepath_2x2, 4);
+  int** solutions_2x2[100];  // TODO: parametrize
+  sudoku_solve_all(input_board_2x2, 4, solutions_2x2);
+
+  int n = 4;
   for (int i = 0; i < n; i++) {
-    array_print_2d(solutions[i], n, n);
+    // array_print_2d(solutions[i], n, n);
+    array_print_2d(solutions_2x2[i], n, n);
     printf("\n");
   }
 }
@@ -107,10 +127,11 @@ void test_sudoku_generate_solved_board() {
 int main(void) {
   UNITY_BEGIN();
 
+  RUN_TEST(test_sudoku_read_board_invalid_filepath);
   RUN_TEST(test_sudoku_read_board);
   RUN_TEST(test_sudoku_is_board_valid);
-  RUN_TEST(test_sudoku_solve);
-  // RUN_TEST(test_sudoku_solve_all);
+  // RUN_TEST(test_sudoku_solve);
+  RUN_TEST(test_sudoku_solve_all);
   // RUN_TEST(test_sudoku_generate_solved_board);
 
   UNITY_END();
