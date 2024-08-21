@@ -173,14 +173,14 @@ Pair next_cell(const int n, int i, int j) {
 }
 
 int try_to_place(int** board, const int n, int** solutions[], int solution_idx,
-                 int max_solutions, int i, int j) {
-  printf("Start i: %d, j: %d, solution_idx: %d\n", i, j, solution_idx);
+                 const int max_solutions, int i, int j) {
+  // printf("Start i: %d, j: %d, solution_idx: %d\n", i, j, solution_idx);
   if (board[i][j] != EMPTY) {
     if (i == n - 1 && j == n - 1) {
-      printf("Found solution 0\n");
+      // printf("Found solution 0\n");
       solutions[solution_idx] = array_copy_2d(board, n, n);
       solution_idx = solution_idx + 1;
-      printf("return 0: %d\n", solution_idx);
+      // printf("return 0: %d\n", solution_idx);
       board[i][j] = EMPTY;
       return solution_idx;
     }
@@ -189,7 +189,7 @@ int try_to_place(int** board, const int n, int** solutions[], int solution_idx,
     // new_cell.j);
     return try_to_place(board, n, solutions, solution_idx, max_solutions,
                         new_cell.i, new_cell.j);
-    printf("Post return 0\n");
+    // printf("Post return 0\n");
     // if (solution_idx >= max_solutions) {
     //   return solution_idx;
     // }
@@ -198,13 +198,13 @@ int try_to_place(int** board, const int n, int** solutions[], int solution_idx,
   for (int number = 1; number < n + 1; number++) {
     // printf("Number: %d\n", number);
     if (ok_to_place(board, n, i, j, number)) {
-      printf("Is ok to place: i: %d, j: %d, number: %d\n", i, j, number);
+      // printf("Is ok to place: i: %d, j: %d, number: %d\n", i, j, number);
       board[i][j] = number;
       if (i == n - 1 && j == n - 1) {
         // printf("Found solution 1\n");
         solutions[solution_idx] = array_copy_2d(board, n, n);
         solution_idx = solution_idx + 1;
-        printf("return 1: %d\n", solution_idx);
+        // printf("return 1: %d\n", solution_idx);
         board[i][j] = EMPTY;
         return solution_idx;
       }
@@ -213,8 +213,9 @@ int try_to_place(int** board, const int n, int** solutions[], int solution_idx,
       // if (found_solution) {
       //   return 1;
       // }
-      printf("try_to_place i: %d, j: %d, number: %d, solution_idx: %d\n", i, j,
-             number, solution_idx);
+      // printf("try_to_place i: %d, j: %d, number: %d, solution_idx: %d\n", i,
+      // j,
+      //        number, solution_idx);
       solution_idx = try_to_place(board, n, solutions, solution_idx,
                                   max_solutions, new_cell.i, new_cell.j);
       if (solution_idx >= max_solutions) {
@@ -234,25 +235,26 @@ int** sudoku_solve(int** input_board, const int n) {
   // int found_solution = try_to_place(board, 0, 0);
 
   int** solutions[100];  // TODO: parametrize
-  printf("Start try_to_place solve\n");
+  // printf("Start try_to_place solve\n");
   try_to_place(board, n, solutions, 0, 1, 0, 0);
   // if (found_solution) {
   //   return board;
   // }
   // return NULL;
-  printf("After try_to_place solve\n");
+  // printf("After try_to_place solve\n");
   int** solution = array_create_2d(n, n);
   solution = solutions[0];
   return solution;
 }
 
-int sudoku_solve_all(int** input_board, const int n, int** solutions[]) {
+int sudoku_solve_all(int** input_board, const int n, int** solutions[],
+                     const int max_solutions) {
   // TODO: Same as above: should probably ask user to pass an empty board so
   // they know to deallocate?
 
   int** board = array_copy_2d(input_board, n, n);
-  printf("Start try_to_place solve_all\n");
-  int num_solutions = try_to_place(board, n, solutions, 0, 300, 0, 0);
+  // printf("Start try_to_place solve_all\n");
+  int num_solutions = try_to_place(board, n, solutions, 0, max_solutions, 0, 0);
   return num_solutions;
 }
 

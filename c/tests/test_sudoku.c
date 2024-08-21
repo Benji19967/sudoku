@@ -95,32 +95,47 @@ void test_sudoku_solve() {
   TEST_ASSERT_TRUE(sudoku_is_board_valid(solved_board_2x2, 4));
 }
 
-void test_sudoku_solve_all() {
-  // char* input_board_filepath =
-  //     "tests/fixtures/mock_board_non_unique_solution.csv";
-  // int** input_board = read_board_or_fail(input_board_filepath, 9);
-  // int** solutions[100];  // TODO: parametrize
-  // sudoku_solve_all(input_board, 9, solutions);
+void assert_each_solution_is_unique(int** solutions[], const int num_solutions,
+                                    const int n) {
+  for (int i = 0; i < num_solutions - 1; i++) {
+    for (int j = i + 1; j < num_solutions; j++) {
+      TEST_ASSERT_FALSE(array_is_equal_2d(solutions[i], solutions[j], n, n));
+    }
+  }
+}
 
+void test_sudoku_solve_all() {
+  // Can you parametrize this test?
+  bool verbose = false;
+
+  int max_num_solutions = 500;
+  char* input_board_filepath =
+      "tests/fixtures/mock_board_non_unique_solution.csv";
+  int** input_board = read_board_or_fail(input_board_filepath, 9);
+  int** solutions[max_num_solutions];
+  int num_solutions =
+      sudoku_solve_all(input_board, 9, solutions, max_num_solutions);
+  assert_each_solution_is_unique(solutions, num_solutions, 9);
+  TEST_ASSERT_EQUAL_INT(max_num_solutions, num_solutions);
+
+  int max_num_solutions_2x2 = 500;
   char* input_board_filepath_2x2 =
       "tests/fixtures/mock_board_non_unique_solution_2x2.csv";
   int** input_board_2x2 = read_board_or_fail(input_board_filepath_2x2, 4);
-  int** solutions_2x2[300];  // TODO: parametrize
-  int num_solutions = sudoku_solve_all(input_board_2x2, 4, solutions_2x2);
+  int** solutions_2x2[max_num_solutions_2x2];
+  int num_solutions_2x2 = sudoku_solve_all(input_board_2x2, 4, solutions_2x2,
+                                           max_num_solutions_2x2);
+  assert_each_solution_is_unique(solutions_2x2, num_solutions_2x2, 4);
+  // TEST_ASSERT_EQUAL_INT(max_num_solutions_2x2, num_solutions_2x2);
 
-  int n = 4;
-  for (int i = 0; i < num_solutions; i++) {
-    // array_print_2d(solutions[i], n, n);
-    array_print_2d(solutions_2x2[i], n, n);
-    printf("\n");
-  }
-  for (int i = 0; i < num_solutions - 1; i++) {
-    for (int j = i + 1; j < num_solutions; j++) {
-      TEST_ASSERT_FALSE(
-          array_is_equal_2d(solutions_2x2[i], solutions_2x2[j], n, n));
+  if (verbose) {
+    int n = 9;
+    for (int i = 0; i < num_solutions; i++) {
+      array_print_2d(solutions[i], n, n);
+      printf("\n");
     }
+    printf("Num solutions: %d\n", num_solutions);
   }
-  printf("Num solutions: %d\n", num_solutions);
 }
 
 void test_sudoku_generate_solved_board() {
@@ -137,7 +152,7 @@ int main(void) {
   RUN_TEST(test_sudoku_read_board_invalid_filepath);
   RUN_TEST(test_sudoku_read_board);
   RUN_TEST(test_sudoku_is_board_valid);
-  // RUN_TEST(test_sudoku_solve);
+  RUN_TEST(test_sudoku_solve);
   RUN_TEST(test_sudoku_solve_all);
   // RUN_TEST(test_sudoku_generate_solved_board);
 
