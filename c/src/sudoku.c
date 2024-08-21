@@ -148,11 +148,11 @@ Pair next_cell(const int n, int i, int j) {
 
 int try_to_place(int** board, const int n, int** solutions[], int solution_idx,
                  int max_solutions, int i, int j) {
-  // printf("Start i: %d, j: %d, solution_idx: %d\n", i, j, solution_idx);
+  printf("Start i: %d, j: %d, solution_idx: %d\n", i, j, solution_idx);
   if (board[i][j] != EMPTY) {
     if (i == n - 1 && j == n - 1) {
-      // printf("Found solution 0\n");
-      solutions[solution_idx] = array_copy_2d(board, 9, 9);
+      printf("Found solution 0\n");
+      solutions[solution_idx] = array_copy_2d(board, n, n);
       solution_idx = solution_idx + 1;
       printf("return 0: %d\n", solution_idx);
       board[i][j] = EMPTY;
@@ -170,11 +170,13 @@ int try_to_place(int** board, const int n, int** solutions[], int solution_idx,
   }
 
   for (int number = 1; number < n + 1; number++) {
+    printf("Number: %d\n", number);
     if (ok_to_place(board, n, i, j, number)) {
+      printf("Is ok to place: i: %d, j: %d, number: %d\n", i, j, number);
       board[i][j] = number;
       if (i == n - 1 && j == n - 1) {
         // printf("Found solution 1\n");
-        solutions[solution_idx] = array_copy_2d(board, 9, 9);
+        solutions[solution_idx] = array_copy_2d(board, n, n);
         solution_idx = solution_idx + 1;
         printf("return 1: %d\n", solution_idx);
         board[i][j] = EMPTY;
@@ -206,12 +208,14 @@ int** sudoku_solve(int** input_board, const int n) {
   // int found_solution = try_to_place(board, 0, 0);
 
   int** solutions[100];  // TODO: parametrize
+  printf("Start try_to_place solve\n");
   try_to_place(board, n, solutions, 0, 1, 0, 0);
   // if (found_solution) {
   //   return board;
   // }
   // return NULL;
-  int** solution = array_create_2d(9, 9);
+  printf("After try_to_place solve\n");
+  int** solution = array_create_2d(n, n);
   solution = solutions[0];
   return solution;
 }
