@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
 
 #include "../data_structures/ds_c/src/array.h"
@@ -108,6 +109,7 @@ void test_sudoku_solve_all() {
   // Can you parametrize this test?
   bool verbose = false;
 
+  // TODO: Add a few more test cases for 2x2
   int max_num_solutions = 500;
   char* input_board_filepath =
       "tests/fixtures/mock_board_non_unique_solution.csv";
@@ -139,9 +141,15 @@ void test_sudoku_solve_all() {
 }
 
 void test_sudoku_generate_solved_board() {
-  int n = 9;
-  int** board = sudoku_generate_solved_board(n);
-  // array_print_2d(board, n, n);
+  bool verbose = false;
+
+  srand(time(0));
+  int n = 4;
+  int** board = sudoku_generate_solved_board(4, n);
+
+  if (verbose) {
+    array_print_2d(board, n, n);
+  }
 
   TEST_ASSERT_TRUE(sudoku_is_board_valid(board, n));
 }
@@ -154,7 +162,7 @@ int main(void) {
   RUN_TEST(test_sudoku_is_board_valid);
   RUN_TEST(test_sudoku_solve);
   RUN_TEST(test_sudoku_solve_all);
-  // RUN_TEST(test_sudoku_generate_solved_board);
+  RUN_TEST(test_sudoku_generate_solved_board);
 
   UNITY_END();
 
