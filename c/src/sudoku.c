@@ -241,17 +241,19 @@ int random_int(int min, int max) {
   return rand() % (max - min + 1) + min;
 }
 
-int** sudoku_generate_solved_board(const int initial_numbers_to_place,
+int** sudoku_generate_solved_board(int** initial_board,
+                                   const int initial_number_to_place,
                                    const int n) {
   // TODO: There are probably more efficient ways to achieve this. The current
-  // solutions is quite brute force.
+  // solution is quite brute force.
 
   int** solved_board = NULL;
+  int** board = NULL;
   while (solved_board == NULL) {
-    int** board = array_create_2d(n, n);
+    board = array_create_2d(n, n);
 
     int numbers_placed = 0;
-    while (numbers_placed < initial_numbers_to_place) {
+    while (numbers_placed < initial_number_to_place) {
       int min_number = 1;
       int max_number = n;
       int number = random_int(min_number, max_number);
@@ -266,8 +268,19 @@ int** sudoku_generate_solved_board(const int initial_numbers_to_place,
         numbers_placed++;
       }
     }
-    solved_board = sudoku_solve(board, n);
+    int** board_to_solve = array_copy_2d(board, n, n);
+    solved_board = sudoku_solve(board_to_solve, n);
   }
+  array_copy_into_dst_2d(board, initial_board, n, n);
 
   return solved_board;
+}
+
+int** sudoku_generate_board(const int number_of_empty_cells, const int n) {
+  int total_number_of_cells = n * n;
+  int initial_number_to_place = total_number_of_cells - number_of_empty_cells;
+  int** initial_board = array_create_2d(n, n);
+  sudoku_generate_solved_board(initial_board, initial_number_to_place, n);
+
+  return initial_board;
 }

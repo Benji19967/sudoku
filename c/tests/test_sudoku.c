@@ -145,13 +145,26 @@ void test_sudoku_generate_solved_board() {
 
   srand(time(0));
   int n = 4;
-  int** board = sudoku_generate_solved_board(4, n);
+  int** initial_board = array_create_2d(n, n);
+  int** board = sudoku_generate_solved_board(initial_board, 4, n);
 
   if (verbose) {
     array_print_2d(board, n, n);
   }
 
   TEST_ASSERT_TRUE(sudoku_is_board_valid(board, n));
+}
+
+void test_sudoku_generate_board() {
+  // TODO: Assert only one solution. Or state how many possible solutions there
+  // are.
+  int n = 4;
+  int num_empty_cells = 12;
+  int** board = sudoku_generate_board(num_empty_cells, n);
+  int** solved_board = sudoku_solve(board, n);
+
+  // TODO: TEST_ASSERT_EQUAL_INT(12, sudoku_num_empty_cells(board, n));
+  TEST_ASSERT_TRUE(sudoku_is_board_valid(solved_board, n));
 }
 
 int main(void) {
@@ -163,6 +176,7 @@ int main(void) {
   RUN_TEST(test_sudoku_solve);
   RUN_TEST(test_sudoku_solve_all);
   RUN_TEST(test_sudoku_generate_solved_board);
+  RUN_TEST(test_sudoku_generate_board);
 
   UNITY_END();
 
