@@ -152,6 +152,7 @@ void test_sudoku_generate_solved_board() {
     array_print_2d(board, n, n);
   }
 
+  // TODO: TEST_ASSERT_EQUAL_INT(4*4 - 4, sudoku_num_empty_cells(board, n));
   TEST_ASSERT_TRUE(sudoku_is_board_valid(board, n));
 }
 
