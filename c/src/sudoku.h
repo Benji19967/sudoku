@@ -1,6 +1,6 @@
 #include <stdbool.h>
 
-int** sudoku_read_board(char* filepath, const int n);
+int** sudoku_read_board(const char* filepath, const int n);
 bool sudoku_is_board_valid(int** board, const int n);
 int** sudoku_generate_solved_board(int** initial_board,
                                    const int initial_number_to_place,

@@ -16,7 +16,7 @@ typedef struct Pair {
   int j;
 } Pair;
 
-int** sudoku_read_board(char* filepath, const int n) {
+int** sudoku_read_board(const char* filepath, const int n) {
   // TODO: Would it be a better design decision to ask users to pass in an array
   // for board?
   // That way they know they have to take care of allocating/deallocating
