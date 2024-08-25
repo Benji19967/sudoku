@@ -277,6 +277,9 @@ int** sudoku_generate_solved_board(int** initial_board,
 }
 
 int** sudoku_generate_board(const int number_of_empty_cells, const int n) {
+  // TODO: can get stuck when number of empty cells is too large
+
+  srand(time(0));
   int total_number_of_cells = n * n;
   int initial_number_to_place = total_number_of_cells - number_of_empty_cells;
   int** initial_board = array_create_2d(n, n);
