@@ -74,7 +74,8 @@ int cmd_generate(int argc, const char **argv) {
 
   int **board = sudoku_generate_board(number_of_empty_cells, n);
 
-  array_print_2d(board, n, n);
+  // array_print_2d(board, n, n);
+  sudoku_print_board(board, n);
 
   return 0;
 }

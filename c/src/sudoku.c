@@ -56,6 +56,26 @@ int** sudoku_read_board(const char* filepath, const int n) {
   return board;
 }
 
+void sudoku_print_board(int** board, const int n) {
+  const int sqrt_n = sqrt(n);
+  for (int i = 0; i < n; i++) {
+    if (i % sqrt_n == 0 && i != 0) {
+      int num_row_characters = n + (sqrt_n - 1);
+      for (int k = 0; k < 2 * num_row_characters - 1; k++) {
+        printf("-");
+      }
+      printf("\n");
+    }
+    for (int j = 0; j < n; j++) {
+      if (j % sqrt_n == 0 && j != 0) {
+        printf("| ");
+      }
+      printf("%d ", board[i][j]);
+    }
+    printf("\n");
+  }
+}
+
 int ok_to_place(int** board, const int n, int i, int j, int number) {
   int sqrt_n = sqrt(n);
 
@@ -109,8 +129,8 @@ int sudoku_get_bloc_index(const int n, int i, int j) {
 }
 
 /*
- * If a number appears more than once in a row, col, or bloc, then the board is
- * invalid.
+ * If a number appears more than once in a row, col, or bloc, then the board
+ * is invalid.
  */
 bool sudoku_is_board_invalid(int** board, const int n) {
   int rows[n][n + 1];
@@ -211,7 +231,8 @@ int** sudoku_solve(int** input_board, const int n) {
   // TODO: Same as above: should probably ask user to pass an empty board so
   // they know to deallocate?
   // TODO: Maybe, for consistency, make the API similar to solve_all where the
-  // users needs to pass a placeholder for the solution (here: int** solution).
+  // users needs to pass a placeholder for the solution (here: int**
+  // solution).
 
   int** board = array_copy_2d(input_board, n, n);
   int** solutions[1];
