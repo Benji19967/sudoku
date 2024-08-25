@@ -4,3 +4,6 @@
 [submodule "c/data_structures"]
 	path = c/data_structures
 	url = git@github.com:Benji19967/data_structures.git
+[submodule "c/argparse"]
+	path = c/argparse
+	url = git@github.com:cofyc/argparse.git

@@ -4,7 +4,7 @@
 TARGET_EXEC := sudoku
 
 BUILD_DIR := ./build
-SRC_DIRS := ./src ./data_structures/ds_c/src
+SRC_DIRS := ./src ./data_structures/ds_c/src ./argparse/argparse.c
 
 # Find all the C and C++ files we want to compile
 # Note the single quotes around the * expressions. The shell will incorrectly expand 
