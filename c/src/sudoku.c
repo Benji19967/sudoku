@@ -6,6 +6,7 @@
 #include <time.h>
 
 #include "../data_structures/ds_c/src/array.h"
+#include "../data_structures/ds_c/src/str.h"
 
 #define STRING_BUFFER_SIZE 200
 
@@ -56,12 +57,41 @@ int** sudoku_read_board(const char* filepath, const int n) {
   return board;
 }
 
+int _sudoku_print__max_chars_per_cell(const int n) {
+  return log10(n) + 1;
+}
+
+int _sudoku_print__num_rows(const int n) {
+  return sqrt(n);
+}
+
+int _sudoku_print__num_cols(const int n) {
+  return sqrt(n);
+}
+
+int _sudoku_print__num_horizontal_dashes(const int n) {
+  // Per row
+  const int num_dividers = sqrt(n) - 1;
+  const int num_cells = n;
+  const int num_spaces = num_dividers + num_cells - 1;
+
+  const int cell_width = _sudoku_print__max_chars_per_cell(n);
+
+  return num_dividers + num_spaces + (num_cells * cell_width);
+}
+
+/*
+ * To figure out (depending on n):
+ * - Max number of characters of one cell
+ * - Number of rows/cols
+ * - Number of dashes to print horizontally
+ */
 void sudoku_print_board(int** board, const int n) {
   const int sqrt_n = sqrt(n);
   for (int i = 0; i < n; i++) {
     if (i % sqrt_n == 0 && i != 0) {
-      int num_row_characters = n + (sqrt_n - 1);
-      for (int k = 0; k < 2 * num_row_characters - 1; k++) {
+      int num_dashes = _sudoku_print__num_horizontal_dashes(n);
+      for (int k = 0; k < num_dashes; k++) {
         printf("-");
       }
       printf("\n");
@@ -70,7 +100,13 @@ void sudoku_print_board(int** board, const int n) {
       if (j % sqrt_n == 0 && j != 0) {
         printf("| ");
       }
-      printf("%d ", board[i][j]);
+      int number = board[i][j];
+      int num_chars = number == 0 ? 1 : log10(number) + 1;
+      int num_spaces_padding = _sudoku_print__max_chars_per_cell(n) - num_chars;
+      printf("%d ", number);
+      if (num_spaces_padding > 0) {
+        printf("%s", string_n_times_char(" ", num_spaces_padding));
+      }
     }
     printf("\n");
   }

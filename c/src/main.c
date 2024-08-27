@@ -17,6 +17,7 @@
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 
+// TODO: How do I list the subcommands in `--help`
 static const char *const usages[] = {
     "subcommands [options] [cmd] [args]",
     NULL,

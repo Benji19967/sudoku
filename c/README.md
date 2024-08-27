@@ -3,17 +3,17 @@
 ## Getting started
 
 ```bash
-git@github.com:ThrowTheSwitch/Unity.git unity
+git submodule update --init
 ```
 
-## Solving a puzzle
+## CLI
 
 ```bash
-./build/sudoku <filepath>
+./build/sudoku --help
 ```
 
-Example:
+## Tests
 
 ```bash
-./build/sudoku ../boards/input/004_5.csv
+make test
 ```
