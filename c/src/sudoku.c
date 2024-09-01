@@ -7,6 +7,7 @@
 
 #include "../data_structures/ds_c/src/array.h"
 #include "../data_structures/ds_c/src/str.h"
+#include "logger.h"
 
 #define STRING_BUFFER_SIZE 200
 
@@ -336,11 +337,15 @@ int** sudoku_generate_solved_board(int** initial_board,
 int** sudoku_generate_board(const int number_of_empty_cells, const int n) {
   // TODO: can get stuck when number of empty cells is too large
 
+  logger("Generate", "Starting generate a board");
+
   srand(time(0));
   int total_number_of_cells = n * n;
   int initial_number_to_place = total_number_of_cells - number_of_empty_cells;
   int** initial_board = array_create_2d(n, n);
   sudoku_generate_solved_board(initial_board, initial_number_to_place, n);
+
+  logger("Generate", "Done generating a board");
 
   return initial_board;
 }
