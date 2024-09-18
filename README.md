@@ -5,7 +5,8 @@
 ### C
 
 ```bash
-hyperfine build/sudoku
+cd c/
+hyperfine "build/sudoku solve -n 9 -p ../boards/input/004_5.csv"
 ```
 ```
 Benchmark 1: build/sudoku

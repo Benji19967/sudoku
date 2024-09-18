@@ -6,7 +6,6 @@
 #include "../data_structures/ds_c/src/array.h"
 #include "sudoku.h"
 
-// TODO: Add logging
 // TODO: Raise an error if input file does not exist
 
 /*
