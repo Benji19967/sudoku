@@ -63,8 +63,8 @@ test_sudoku:
 		data_structures/ds_c/src/array.c \
 		data_structures/ds_c/src/str.c \
 		unity/src/unity.c \
-		-o tests/test_sudoku.out \
-		&& tests/test_sudoku.out
+	-o tests/test_sudoku.out \
+	&& tests/test_sudoku.out
 
 # test_two_sum:
 # 	gcc tests/test_two_sum.c src/two_sum.c data_structures/ds_c/src/hashmap.c data_structures/ds_c/src/singly_linked_list.c unity/src/unity.c -o tests/test_two_sum.out && tests/test_two_sum.out

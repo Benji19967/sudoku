@@ -10,6 +10,8 @@ git submodule update --init
 
 ```bash
 ./build/sudoku --help
+./build/sudoku generate --help
+./build/sudoku solve --help
 ```
 
 ## Tests

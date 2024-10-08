@@ -19,7 +19,7 @@ typedef struct Pair {
   int j;
 } Pair;
 
-int** sudoku_read_board(const char* filepath, const int n) {
+int** sudoku_read_board(int** board, const char* filepath, const int n) {
   // TODO: Would it be a better design decision to ask users to pass in an array
   // for board?
   // That way they know they have to take care of allocating/deallocating
@@ -33,7 +33,7 @@ int** sudoku_read_board(const char* filepath, const int n) {
     return NULL;
   }
   char string_buffer[STRING_BUFFER_SIZE];
-  int** board = array_create_2d(n, n);
+  // int** board = array_create_2d(n, n);
   char* token;
 
   if (fptr != NULL) {
@@ -58,6 +58,9 @@ int** sudoku_read_board(const char* filepath, const int n) {
 
   return board;
 }
+
+// int** sudoku_write_board(const char* filepath, const int n) {
+// }
 
 int _sudoku_print__max_chars_per_cell(const int n) {
   return log10(n) + 1;
